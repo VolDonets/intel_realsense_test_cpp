@@ -10,10 +10,10 @@
 #include <opencv2/imgcodecs.hpp>
 #include <iostream>
 
-constexpr int XL_POINT_COORD = 200;
-constexpr int YL_POINT_COORD = 400;
-constexpr int XR_POINT_COORD = 800;
-constexpr int YR_POINT_COORD = 400;
+constexpr int XL_POINT_COORD = 50;//200;
+constexpr int YL_POINT_COORD = 200;//400;
+constexpr int XR_POINT_COORD = 550;//800;
+constexpr int YR_POINT_COORD = 200;//400;
 
 constexpr int X_STEP_LENGTH = 5;
 
@@ -59,19 +59,28 @@ bool set_points(cv::Point &left_point, cv::Point &right_point, const rs2::depth_
 int main() {
     // Declare RealSense pipeline, encapsulating the actual device and sensors
     rs2::pipeline pipe;
+
+    rs2::config rsConfig;
+    rsConfig.disable_all_streams();
+    rsConfig.enable_stream(RS2_STREAM_DEPTH, 640, 480);
+    rsConfig.enable_stream(RS2_STREAM_INFRARED, 1);
+
     // Start streaming with default recommended configuration
-    pipe.start();
+    pipe.start(rsConfig);
 
     const auto window_name = "Display Image";
     namedWindow(window_name, WINDOW_AUTOSIZE);
 
-    cv::Rect human_box = cv::Rect(200, 100, 600, 600);
+    //cv::Rect human_box = cv::Rect(200, 100, 600, 600);
+    cv::Rect human_box = cv::Rect(50, 100, 500, 300);
     cv::Point left_point(XL_POINT_COORD, YL_POINT_COORD);
     cv::Point right_point(XR_POINT_COORD, YR_POINT_COORD);
 
     while (waitKey(1) < 0 && getWindowProperty(window_name, WND_PROP_AUTOSIZE) >= 0) {
         rs2::frameset data = pipe.wait_for_frames(); // Wait for next set of frames from the camera
         rs2::depth_frame depth = data.get_depth_frame();
+
+        std::cout << "depth param: W->" << depth.get_width() << ", H->" << depth.get_height() << "\n";
 
         float dist_to_left_point = -0.1f;
         float dist_to_right_point = -0.1f;
