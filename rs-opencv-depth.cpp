@@ -10,10 +10,10 @@
 #include <opencv2/imgcodecs.hpp>
 #include <iostream>
 
-constexpr int XL_POINT_COORD = 50;//200;
-constexpr int YL_POINT_COORD = 200;//400;
-constexpr int XR_POINT_COORD = 550;//800;
-constexpr int YR_POINT_COORD = 200;//400;
+constexpr int XL_POINT_COORD = /*50;//*/200;
+constexpr int YL_POINT_COORD = /*200;//*/400;
+constexpr int XR_POINT_COORD = /*550;//*/800;
+constexpr int YR_POINT_COORD = /*200;//*/400;
 
 constexpr int X_STEP_LENGTH = 5;
 
@@ -62,8 +62,10 @@ int main() {
 
     rs2::config rsConfig;
     rsConfig.disable_all_streams();
-    rsConfig.enable_stream(RS2_STREAM_DEPTH, 640, 480);
+    //rsConfig.enable_stream(RS2_STREAM_DEPTH, 640, 480);
+    rsConfig.enable_stream(RS2_STREAM_DEPTH, 1280, 720);
     rsConfig.enable_stream(RS2_STREAM_INFRARED, 1);
+    rsConfig.enable_stream(RS2_STREAM_COLOR, 640, 480);
 
     // Start streaming with default recommended configuration
     pipe.start(rsConfig);
@@ -71,8 +73,8 @@ int main() {
     const auto window_name = "Display Image";
     namedWindow(window_name, WINDOW_AUTOSIZE);
 
-    //cv::Rect human_box = cv::Rect(200, 100, 600, 600);
-    cv::Rect human_box = cv::Rect(50, 100, 500, 300);
+    cv::Rect human_box = cv::Rect(200, 100, 600, 600);
+    //cv::Rect human_box = cv::Rect(50, 100, 500, 300);
     cv::Point left_point(XL_POINT_COORD, YL_POINT_COORD);
     cv::Point right_point(XR_POINT_COORD, YR_POINT_COORD);
 
@@ -81,6 +83,7 @@ int main() {
         rs2::depth_frame depth = data.get_depth_frame();
 
         std::cout << "depth param: W->" << depth.get_width() << ", H->" << depth.get_height() << "\n";
+        std::cout << "color param: W->" << data.get_color_frame().get_width() << ", H->" << data.get_color_frame().get_height() << "\n\n\n";
 
         float dist_to_left_point = -0.1f;
         float dist_to_right_point = -0.1f;
